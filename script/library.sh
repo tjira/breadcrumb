@@ -4,7 +4,7 @@
 [ $# -ne 2 ] && echo "USAGE: $0 MODE CORES" && exit 1
 
 # assign the arguments
-CORES=$2; MODE=$1; [ $MODE == "STATIC" ] && STATIC=1 || STATIC=0; [ $MODE == "SHARED" ] && SHARED=1 || SHARED=0; [ $SHARED -eq 0 ] && [ $STATIC -eq 0 ] && echo "INVALID MODE" && exit 1
+CORES=$2; MODE=$1; [ $MODE == "STATIC" ] && STATIC="yes" || STATIC="no"; [ $MODE == "SHARED" ] && SHARED="yes" || SHARED="no"; [ $SHARED == "no" ] && [ $STATIC == "no" ] && echo "INVALID MODE" && exit 1
 
 # make the folders
 mkdir -p external && mkdir -p external/include && mkdir -p external/lib
