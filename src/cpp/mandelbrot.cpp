@@ -12,13 +12,13 @@ struct Image {
 };
 
 template <typename T>
-void draw_escape(Image& image, const std::complex<T>& center, T zoom, unsigned int iterations, double bailout, bool smooth) {
+void draw_escape(Image& image, const std::complex<T>& center, T zoom, unsigned int iterations, T bailout, bool smooth) {
     #pragma omp parallel for collapse(2) num_threads(nthread)
     for (int i = 0; i < image.height; i++) {
         for (int j = 0; j < image.width; j++) {
 
-            T im = -center.imag() + T(3.0 * (i + 0.5) - 1.5 * image.height) / zoom / T(image.height);
-            T re =  center.real() + T(3.0 * (j + 0.5) - 1.5 * image.width)  / zoom / T(image.height);
+            T im = -center.imag() + (3.0 * (i + 0.5) - 1.5 * image.height) / zoom / image.height;
+            T re =  center.real() + (3.0 * (j + 0.5) - 1.5 * image.width)  / zoom / image.height;
 
             std::complex<T> p = {re, im}, z = T(0); int n; T v;
 
