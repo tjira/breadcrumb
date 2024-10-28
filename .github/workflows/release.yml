@@ -1,0 +1,154 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v**'
+
+permissions:
+  contents: write
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-libs_linux-shared_x86-64:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and Compile Libraries
+        run: ./script/general/library.sh SHARED 2
+
+      - name: Remove Redundant Files
+        run: rm -rf external/lib/pkgconfig external/lib/*.la
+
+      - name: Package the Libraries
+        run: cd external && tar -czf breadcrumb-libs_linux-shared_x86-64.tar.gz * && cd -
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs_linux-shared
+          path: external/breadcrumb-libs_linux-shared_x86-64.tar.gz
+
+  build-libs_linux-static_x86-64:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and Compile Libraries
+        run: ./script/general/library.sh STATIC 2
+
+      - name: Remove Redundant Files
+        run: rm -rf external/lib/pkgconfig external/lib/*.la
+
+      - name: Package the Libraries
+        run: cd external && tar -czf breadcrumb-libs_linux-static_x86-64.tar.gz * && cd -
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs_linux-static
+          path: external/breadcrumb-libs_linux-static_x86-64.tar.gz
+
+  build-breadcrumb_linux-shared_x86-64:
+    runs-on: ubuntu-22.04
+    needs: [build-libs_linux-shared_x86-64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Extract the Libraries
+        run: mkdir external && mv libs_linux-shared/breadcrumb-libs_linux-shared_x86-64.tar.gz external/ && cd external && tar -xzf breadcrumb-libs_linux-shared_x86-64.tar.gz && cd -
+
+      - name: Configure Breadcrumb
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSTATIC=OFF
+
+      - name: Build Breadcrumb
+        run: cmake --build build --parallel 2 --verbose
+
+      - name: Rename Binaries
+        run: |
+          mv bin/mersenne bin/mersenne_linux-shared_x86-64
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-shared
+          path: |
+            bin/mersenne_linux-shared_x86-64
+
+  build-breadcrumb_linux-static_x86-64:
+    runs-on: ubuntu-22.04
+    needs: [build-libs_linux-static_x86-64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Extract the Libraries
+        run: mkdir external && mv libs_linux-static/breadcrumb-libs_linux-static_x86-64.tar.gz external/ && cd external && tar -xzf breadcrumb-libs_linux-static_x86-64.tar.gz && cd -
+
+      - name: Configure Breadcrumb
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSTATIC=ON
+
+      - name: Build Breadcrumb
+        run: cmake --build build --parallel 2 --verbose
+
+      - name: Rename Binaries
+        run: |
+          mv bin/mersenne bin/mersenne_linux-static_x86-64
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-static
+          path: |
+            bin/mersenne_linux-static_x86-64
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-breadcrumb_linux-shared_x86-64, build-breadcrumb_linux-static_x86-64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create x86-64 Linux Shared Packages
+        run: |
+          cp linux-shared/mersenne_linux-shared_x86-64 mersenne
+          tar -czf breadcrumb_linux-shared_x86-64.tar.gz mersenne LICENSE.md
+
+      - name: Create x86-64 Linux Static Packages
+        run: |
+          cp linux-static/mersenne_linux-static_x86-64 mersenne
+          tar -czf breadcrumb_linux-static_x86-64.tar.gz mersenne LICENSE.md
+
+      - name: Copy x86-64 Linux Shared and Static Libraries to the Root Folder
+        run: |
+          mv libs_linux-shared/breadcrumb-libs_linux-shared_x86-64.tar.gz .
+          mv libs_linux-static/breadcrumb-libs_linux-static_x86-64.tar.gz .
+
+      - name: Release linux-shared_x86-64 Version of Breadcrumb
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          file: breadcrumb_linux-shared_x86-64.tar.gz
+          tag: ${{github.ref}}
+
+      - name: Release linux-static_x86-64 Version of Breadcrumb
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          file: breadcrumb_linux-static_x86-64.tar.gz
+          tag: ${{github.ref}}
