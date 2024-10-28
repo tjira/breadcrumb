@@ -90,11 +90,6 @@ jobs:
           cp linux-static/mersenne_linux-static_x86-64 mersenne
           tar -czf breadcrumb_linux-static_x86-64.tar.gz mandelbrot mersenne LICENSE.md
 
-      - name: Copy x86-64 Linux Shared and Static Libraries to the Root Folder
-        run: |
-          mv libs_linux-shared/breadcrumb-libs_linux-shared_x86-64.tar.gz .
-          mv libs_linux-static/breadcrumb-libs_linux-static_x86-64.tar.gz .
-
       - name: Release linux-shared_x86-64 Version of Breadcrumb
         uses: svenstaro/upload-release-action@v2
         with:
