@@ -14,7 +14,6 @@ env:
 jobs:
   build-breadcrumb_linux-shared_x86-64:
     runs-on: ubuntu-22.04
-    needs: [build-libs_linux-shared_x86-64]
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +42,6 @@ jobs:
 
   build-breadcrumb_linux-static_x86-64:
     runs-on: ubuntu-22.04
-    needs: [build-libs_linux-static_x86-64]
 
     steps:
       - uses: actions/checkout@v4
