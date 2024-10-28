@@ -39,10 +39,10 @@ void draw_density(Image& image, const std::complex<T>& center, T zoom, const Den
             z = z * z + p; if (std::norm(z) > density_algorithm.bailout_radius * density_algorithm.bailout_radius) break; orbit.push_back(z);
         }
 
-        if (std::norm(z) > density_algorithm.bailout_radius * density_algorithm.bailout_radius) for (const std::complex<double>& o : orbit) {
+        if (std::norm(z) > density_algorithm.bailout_radius * density_algorithm.bailout_radius) for (const std::complex<T>& o : orbit) {
 
-            int i = std::round(((o.imag() + center.imag()) * image.height * zoom + 1.5 * image.height) / 3.0 - 0.5);
-            int j = std::round(((o.real() - center.real()) * image.height * zoom + 1.5 * image.width)  / 3.0 - 0.5);
+            int i = (int)round(((o.imag() + center.imag()) * image.height * zoom + 1.5 * image.height) / 3.0 - 0.5);
+            int j = (int)round(((o.real() - center.real()) * image.height * zoom + 1.5 * image.width)  / 3.0 - 0.5);
 
             if (i < 0 || j < 0 || i >= image.height || j >= image.width) continue; thread_data.at(0).at(i * image.width + j)++;
         }
@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
 
     if (program.is_used("--density")) {
         if (program.is_used("--mpfr")) {
-            // draw_density<mpfr::mpreal>(image, center, program.get("--zoom"), density_algorithm);
+            draw_density<mpfr::mpreal>(image, center, program.get("--zoom"), density_algorithm);
         } else {
             draw_density<double>(image, {center.real().toDouble(), center.imag().toDouble()}, std::stod(program.get("--zoom")), density_algorithm);
         }
