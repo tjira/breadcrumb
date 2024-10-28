@@ -12,48 +12,6 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build-libs_linux-shared_x86-64:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download and Compile Libraries
-        run: ./script/library.sh SHARED 2
-
-      - name: Remove Redundant Files
-        run: rm -rf external/lib/pkgconfig external/lib/*.la
-
-      - name: Package the Libraries
-        run: cd external && tar -czf breadcrumb-libs_linux-shared_x86-64.tar.gz * && cd -
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: libs_linux-shared
-          path: external/breadcrumb-libs_linux-shared_x86-64.tar.gz
-
-  build-libs_linux-static_x86-64:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download and Compile Libraries
-        run: ./script/library.sh STATIC 2
-
-      - name: Remove Redundant Files
-        run: rm -rf external/lib/pkgconfig external/lib/*.la
-
-      - name: Package the Libraries
-        run: cd external && tar -czf breadcrumb-libs_linux-static_x86-64.tar.gz * && cd -
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: libs_linux-static
-          path: external/breadcrumb-libs_linux-static_x86-64.tar.gz
-
   build-breadcrumb_linux-shared_x86-64:
     runs-on: ubuntu-22.04
     needs: [build-libs_linux-shared_x86-64]
@@ -61,11 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-
-      - name: Extract the Libraries
-        run: mkdir external && mv libs_linux-shared/breadcrumb-libs_linux-shared_x86-64.tar.gz external/ && cd external && tar -xzf breadcrumb-libs_linux-shared_x86-64.tar.gz && cd -
+      - name: Download and Compile Libraries
+        run: ./script/library.sh SHARED 2
 
       - name: Configure Breadcrumb
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSTATIC=OFF
@@ -75,6 +30,7 @@ jobs:
 
       - name: Rename Binaries
         run: |
+          mv bin/mandelbrot bin/mandelbrot_linux-shared_x86-64
           mv bin/mersenne bin/mersenne_linux-shared_x86-64
 
       - name: Upload Artifacts
@@ -82,6 +38,7 @@ jobs:
         with:
           name: linux-shared
           path: |
+            bin/mandelbrot_linux-shared_x86-64
             bin/mersenne_linux-shared_x86-64
 
   build-breadcrumb_linux-static_x86-64:
@@ -91,11 +48,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-
-      - name: Extract the Libraries
-        run: mkdir external && mv libs_linux-static/breadcrumb-libs_linux-static_x86-64.tar.gz external/ && cd external && tar -xzf breadcrumb-libs_linux-static_x86-64.tar.gz && cd -
+      - name: Download and Compile Libraries
+        run: ./script/library.sh STATIC 2
 
       - name: Configure Breadcrumb
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSTATIC=ON
@@ -105,6 +59,7 @@ jobs:
 
       - name: Rename Binaries
         run: |
+          mv bin/mandelbrot bin/mandelbrot_linux-static_x86-64
           mv bin/mersenne bin/mersenne_linux-static_x86-64
 
       - name: Upload Artifacts
@@ -112,6 +67,7 @@ jobs:
         with:
           name: linux-static
           path: |
+            bin/mandelbrot_linux-static_x86-64
             bin/mersenne_linux-static_x86-64
 
   release:
@@ -127,12 +83,12 @@ jobs:
       - name: Create x86-64 Linux Shared Packages
         run: |
           cp linux-shared/mersenne_linux-shared_x86-64 mersenne
-          tar -czf breadcrumb_linux-shared_x86-64.tar.gz mersenne LICENSE.md
+          tar -czf breadcrumb_linux-shared_x86-64.tar.gz mandelbrot mersenne LICENSE.md
 
       - name: Create x86-64 Linux Static Packages
         run: |
           cp linux-static/mersenne_linux-static_x86-64 mersenne
-          tar -czf breadcrumb_linux-static_x86-64.tar.gz mersenne LICENSE.md
+          tar -czf breadcrumb_linux-static_x86-64.tar.gz mandelbrot mersenne LICENSE.md
 
       - name: Copy x86-64 Linux Shared and Static Libraries to the Root Folder
         run: |
