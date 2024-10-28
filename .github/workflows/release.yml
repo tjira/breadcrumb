@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download and Compile Libraries
-        run: ./script/general/library.sh SHARED 2
+        run: ./script/library.sh SHARED 2
 
       - name: Remove Redundant Files
         run: rm -rf external/lib/pkgconfig external/lib/*.la
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download and Compile Libraries
-        run: ./script/general/library.sh STATIC 2
+        run: ./script/library.sh STATIC 2
 
       - name: Remove Redundant Files
         run: rm -rf external/lib/pkgconfig external/lib/*.la
