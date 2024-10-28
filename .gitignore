@@ -3,3 +3,6 @@ external/
 .cache/
 build/
 bin/
+
+# exts
+*.png

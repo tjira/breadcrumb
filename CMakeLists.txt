@@ -29,16 +29,18 @@ include_directories(include external/include)
 find_library(LIBGMPXX NAMES gmpxx PATHS external/lib NO_DEFAULT_PATH)
 find_library(LIBGMP NAMES gmp PATHS external/lib NO_DEFAULT_PATH)
 
-# find system packages
-find_package(OpenMP REQUIRED)
-
 # add executables
-add_executable(mersenne src/cpp/mersenne.cpp)
+add_executable(mandelbrot src/cpp/mandelbrot.cpp)
+add_executable(mersenne   src/cpp/mersenne.cpp  )
 
 # link the libraries
 target_link_libraries(mersenne ${LIBGMP} ${LIBGMPXX})
 
+# find system packages
+find_package(OpenMP REQUIRED)
+
 # link OpenMP
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(mersenne OpenMP::OpenMP_CXX)
+    target_link_libraries(mandelbrot OpenMP::OpenMP_CXX)
+    target_link_libraries(mersenne   OpenMP::OpenMP_CXX)
 endif()

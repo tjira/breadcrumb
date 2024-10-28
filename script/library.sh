@@ -10,13 +10,13 @@ CORES=$2; MODE=$1; [ $MODE == "STATIC" ] && STATIC=1 || STATIC=0; [ $MODE == "SH
 mkdir -p external && mkdir -p external/include && mkdir -p external/lib
 
 # download argparse
-wget -q -O external/include/argparse.hpp https://raw.githubusercontent.com/p-ranav/argparse/master/include/argparse/argparse.hpp
+wget -O external/include/argparse.hpp https://raw.githubusercontent.com/p-ranav/argparse/master/include/argparse/argparse.hpp
 
 # download stb image
-wget -q -O external/include/stb_image.h https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image.h
+wget -O external/include/stb_image_write.h https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_image_write.h
 
 # download gmp
-wget -q -O external/libgmp.tar.xz https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz
+wget -O external/libgmp.tar.xz https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz
 
 # unpack the archives
 cd external && for ARCHIVE in *.tar.xz; do tar -xf $ARCHIVE; done; cd ..
