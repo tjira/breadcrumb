@@ -27,18 +27,11 @@ jobs:
       - name: Build Breadcrumb
         run: cmake --build build --parallel 2 --verbose
 
-      - name: Rename Binaries
-        run: |
-          mv bin/mandelbrot bin/mandelbrot_linux-shared_x86-64
-          mv bin/mersenne bin/mersenne_linux-shared_x86-64
-
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-shared
-          path: |
-            bin/mandelbrot_linux-shared_x86-64
-            bin/mersenne_linux-shared_x86-64
+          path: bin
 
   build-breadcrumb_linux-static_x86-64:
     runs-on: ubuntu-22.04
@@ -55,18 +48,11 @@ jobs:
       - name: Build Breadcrumb
         run: cmake --build build --parallel 2 --verbose
 
-      - name: Rename Binaries
-        run: |
-          mv bin/mandelbrot bin/mandelbrot_linux-static_x86-64
-          mv bin/mersenne bin/mersenne_linux-static_x86-64
-
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-static
-          path: |
-            bin/mandelbrot_linux-static_x86-64
-            bin/mersenne_linux-static_x86-64
+          path: bin
 
   release:
     runs-on: ubuntu-latest
@@ -79,16 +65,10 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Create x86-64 Linux Shared Packages
-        run: |
-          cp linux-shared/mandelbrot_linux-shared_x86-64 mandelbrot
-          cp linux-shared/mersenne_linux-shared_x86-64 mersenne
-          tar -czf breadcrumb_linux-shared_x86-64.tar.gz mandelbrot mersenne LICENSE.md
+        run: cp -r linux-shared/bin . && tar -czf breadcrumb_linux-shared_x86-64.tar.gz bin LICENSE.md
 
       - name: Create x86-64 Linux Static Packages
-        run: |
-          cp linux-static/mandelbrot_linux-static_x86-64 mandelbrot
-          cp linux-static/mersenne_linux-static_x86-64 mersenne
-          tar -czf breadcrumb_linux-static_x86-64.tar.gz mandelbrot mersenne LICENSE.md
+        run: cp -r linux-static/bin . && tar -czf breadcrumb_linux-static_x86-64.tar.gz bin LICENSE.md
 
       - name: Release linux-shared_x86-64 Version of Breadcrumb
         uses: svenstaro/upload-release-action@v2
