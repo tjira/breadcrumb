@@ -1,14 +1,23 @@
 #!/bin/bash
 
-I=$(shuf -i 0-1000000000 -n 1); I0=$I; random() {
+I=$(shuf -i 0-1000000000 -n 1); CORES=1; random() {
     RANDOM=$4; awk -v min=$1 -v max=$2 -v seed=$RANDOM -v return_int=$3 'BEGIN {srand(seed); print (return_int == 1) ? int(min + rand() * (max - min + 1)) : min + rand() * (max - min)}'
 }
+
+while getopts "c:s:h" ARG; do
+    case $ARG in
+        c) CORES=$OPTARG;;
+        s)     I=$OPTARG;;
+        h) echo "USAGE: $0 [-c CORES] [-s SEED] [-h]"; exit 0;;
+        *) echo "INVALID OPTION: $ARG"; exit 1;;
+    esac
+done && I0=$I
 
 # ======================================================================================================================================================================================================
 # SETTINGS
 # ======================================================================================================================================================================================================
 
-generate() { RANDOM_FRACTAL=1; RANDOM_ALGORITHM=1; RANDOM_COLORING=1; RANDOM_TRAP=1; RANDOM_FILL=1; RANDOM_LINEAR=1; RANDOM_SOLID=1; RANDOM_PERIODIC=1;
+generate() { RANDOM_FRACTAL=1; RANDOM_ALGORITHM=1; RANDOM_COLORING=0; RANDOM_TRAP=1; RANDOM_FILL=1; RANDOM_LINEAR=1; RANDOM_SOLID=1; RANDOM_PERIODIC=1;
 
 # ======================================================================================================================================================================================================
 # FRACTAL
@@ -24,10 +33,10 @@ FRACTALS=("buffalo" "burningship" "julia" "mandelbrot" "manowar" "phoenix"); FRA
 
 ALGORITHMS=("density" "escape" "trap"); ALGORITHM_INDEX=1
 
-[ $FRACTAL_INDEX -eq 0 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 0 2 1 $I) && I=$((I+=1))
-[ $FRACTAL_INDEX -eq 1 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 0 2 1 $I) && I=$((I+=1))
+[ $FRACTAL_INDEX -eq 0 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 1 2 1 $I) && I=$((I+=1))
+[ $FRACTAL_INDEX -eq 1 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 1 2 1 $I) && I=$((I+=1))
 [ $FRACTAL_INDEX -eq 2 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 1 2 1 $I) && I=$((I+=1))
-[ $FRACTAL_INDEX -eq 3 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 0 2 1 $I) && I=$((I+=1))
+[ $FRACTAL_INDEX -eq 3 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 1 2 1 $I) && I=$((I+=1))
 [ $FRACTAL_INDEX -eq 4 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 1 2 1 $I) && I=$((I+=1))
 [ $FRACTAL_INDEX -eq 5 ] && [ $RANDOM_ALGORITHM -eq 1 ] && ALGORITHM_INDEX=$(random 1 2 1 $I) && I=$((I+=1))
 
@@ -72,19 +81,15 @@ PERIODIC_1=31.93; PERIODIC_2=6.26; PERIODIC_3=30.38; PERIODIC_4=5.86; PERIODIC_5
 # POSITION
 # ======================================================================================================================================================================================================
 
-[ $FRACTAL_INDEX -eq 0 ] && CENTER_REAL=-0.45 && CENTER_IMAG=0.45 && ZOOM=0.90 && PARAMETER=0.00
-[ $FRACTAL_INDEX -eq 1 ] && CENTER_REAL=-0.60 && CENTER_IMAG=0.60 && ZOOM=1.20 && PARAMETER=0.00
+[ $FRACTAL_INDEX -eq 0 ] && CENTER_REAL=-0.45 && CENTER_IMAG=0.35 && ZOOM=0.85 && PARAMETER=0.00
+[ $FRACTAL_INDEX -eq 1 ] && CENTER_REAL=-0.45 && CENTER_IMAG=0.60 && ZOOM=1.20 && PARAMETER=0.00
 [ $FRACTAL_INDEX -eq 2 ] && CENTER_REAL=-0.00 && CENTER_IMAG=0.00 && ZOOM=1.20 && PARAMETER=1.57
 [ $FRACTAL_INDEX -eq 3 ] && CENTER_REAL=-0.75 && CENTER_IMAG=0.00 && ZOOM=1.20 && PARAMETER=0.00
 [ $FRACTAL_INDEX -eq 4 ] && CENTER_REAL=-1.30 && CENTER_IMAG=0.00 && ZOOM=1.20 && PARAMETER=0.00
 [ $FRACTAL_INDEX -eq 5 ] && CENTER_REAL=-0.00 && CENTER_IMAG=0.00 && ZOOM=1.65 && PARAMETER=3.14
 
-[ $FRACTAL_INDEX -eq 0 ] && [ $COLORING_INDEX  -eq 2 ] && CENTER_REAL=-0.35 && CENTER_IMAG=0.35 && ZOOM=1.00 && PARAMETER=0.00
-[ $FRACTAL_INDEX -eq 1 ] && [ $ALGORITHM_INDEX -eq 0 ] && CENTER_REAL=-0.10 && CENTER_IMAG=0.20 && ZOOM=1.00 && PARAMETER=0.00
-[ $FRACTAL_INDEX -eq 1 ] && [ $ALGORITHM_INDEX -eq 2 ] && CENTER_REAL=-0.60 && CENTER_IMAG=0.35 && ZOOM=1.00 && PARAMETER=0.00
-[ $FRACTAL_INDEX -eq 4 ] && [ $COLORING_INDEX  -eq 2 ] && CENTER_REAL=-0.10 && CENTER_IMAG=0.00 && ZOOM=8.00 && PARAMETER=0.00
-
-[ $FRACTAL_INDEX -eq 1 ] && [ $COLORING_INDEX  -eq 2 ] && [ $ALGORITHM_INDEX != 0 ] && CENTER_REAL=-0.60 && CENTER_IMAG=0.60 && ZOOM=1.30 && PARAMETER=0.00
+[ $FRACTAL_INDEX -eq 1 ] && [ $ALGORITHM_INDEX -eq 2 ] && [ $TRAP_INDEX -eq 3 ] && CENTER_REAL=-0.45 && CENTER_IMAG=0.30 && ZOOM=0.95 && PARAMETER=0.00 # BURNINGSHIP TRAP-3
+[ $FRACTAL_INDEX -eq 1 ] && [ $ALGORITHM_INDEX -eq 2 ] && [ $TRAP_INDEX -eq 4 ] && CENTER_REAL=-0.45 && CENTER_IMAG=0.30 && ZOOM=0.95 && PARAMETER=0.00 # BURNINGSHIP TRAP-4
 
 # ======================================================================================================================================================================================================
 # SAMPLE
@@ -111,4 +116,4 @@ COLORING_PARAMS=("-l $LINEAR_1 $LINEAR_2 $LINEAR_3 $LINEAR_4 $LINEAR_5 $LINEAR_6
 # GENERATION
 # ======================================================================================================================================================================================================
 
-echo -n "RANDOM=$I0 " && set -x && ./bin/fractal -c $CENTER_REAL $CENTER_IMAG -f ${FRACTALS[$FRACTAL_INDEX]} $PARAMETER -z $ZOOM ${ALGORITHM_PARAMS[$ALGORITHM_INDEX]} ${COLORING_PARAMS[$COLORING_INDEX]}
+echo -n "RANDOM=$I0 " && set -x && ./bin/fractal -c $CENTER_REAL $CENTER_IMAG -f ${FRACTALS[$FRACTAL_INDEX]} $PARAMETER -z $ZOOM ${ALGORITHM_PARAMS[$ALGORITHM_INDEX]} ${COLORING_PARAMS[$COLORING_INDEX]} -n $CORES
