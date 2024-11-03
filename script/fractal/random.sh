@@ -111,4 +111,4 @@ COLORING_PARAMS=("-l $LINEAR_1 $LINEAR_2 $LINEAR_3 $LINEAR_4 $LINEAR_5 $LINEAR_6
 # GENERATION
 # ======================================================================================================================================================================================================
 
-echo -n "RANDOM=$I0 " && set -x && ./bin/mandelbrot -c $CENTER_REAL $CENTER_IMAG -f ${FRACTALS[$FRACTAL_INDEX]} $PARAMETER -z $ZOOM ${ALGORITHM_PARAMS[$ALGORITHM_INDEX]} ${COLORING_PARAMS[$COLORING_INDEX]}
+echo -n "RANDOM=$I0 " && set -x && ./bin/fractal -c $CENTER_REAL $CENTER_IMAG -f ${FRACTALS[$FRACTAL_INDEX]} $PARAMETER -z $ZOOM ${ALGORITHM_PARAMS[$ALGORITHM_INDEX]} ${COLORING_PARAMS[$COLORING_INDEX]}

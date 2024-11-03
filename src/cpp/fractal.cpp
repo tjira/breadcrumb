@@ -100,9 +100,9 @@ void draw_density(Image& image, const Fractal& fractal, const std::complex<T>& c
 
         std::complex<T> parameter = exp(std::complex<T>{0, 1} * T(fractal.parameter)), z, zp;
 
-        std::tie(std::ignore, z, zp) = fractal_ic_function(p, parameter); int n; T v; std::vector<std::complex<T>> orbit;
+        std::tie(std::ignore, z, zp) = fractal_ic_function(p, parameter); std::vector<std::complex<T>> orbit;
 
-        for(int n = 0; n < density_algorithm.max_iterations; n++) {
+        for (int n = 0; n < density_algorithm.max_iterations; n++) {
             std::tie(z, zp) = fractal_function(p, z, zp, parameter); if (std::norm(z) > density_algorithm.bailout_radius * density_algorithm.bailout_radius) break; orbit.push_back(z);
         }
 
@@ -217,7 +217,7 @@ void draw_trap(Image& image, const Fractal& fractal, const std::complex<T>& cent
 }
 
 int main(int argc, char** argv) {
-    argparse::ArgumentParser program("Mandelbrot", "1.0", argparse::default_arguments::none);
+    argparse::ArgumentParser program("Fractal", "1.0", argparse::default_arguments::none);
 
     program.add_argument("-c", "--center").help("-- Center of the image.").nargs(2).default_value(std::vector<std::string>{"-0.75", "0"});
     program.add_argument("-d", "--density").help("-- Density algorithm with number of iterations, bailout radius, number of samples and seed.").nargs(4).default_value(std::vector<std::string>{"80", "10", "1e7", "1"});
@@ -240,6 +240,10 @@ int main(int argc, char** argv) {
 
     if (program.is_used("--escape") + program.is_used("--trap") + program.is_used("--density") > 1) {
         throw std::runtime_error("YOU CAN USE ONLY ONE ALGORITHM AT A TIME");
+    }
+
+    if (program.is_used("--linear") + program.is_used("--periodic") + program.is_used("--solid") > 1) {
+        throw std::runtime_error("YOU CAN USE ONLY ONE COLORING AT A TIME");
     }
 
     std::complex<mpfr::mpreal> center; nthread = program.get<unsigned int>("--nthread");
@@ -288,7 +292,7 @@ int main(int argc, char** argv) {
     center.imag(mpfr::mpreal(program.get<std::vector<std::string>>("--center").at(1)));
 
     #pragma omp parallel for num_threads(nthread)
-    for (int i = 0; i < nthread; i++) mpfr::mpreal::set_default_prec(program.get<unsigned int>("--mpfr"));
+    for (int i = 0; i < nthread; i++) mpfr::mpreal::set_default_prec(nthread);
 
     if (program.is_used("--linear")) {
         if (program.is_used("--density")) {

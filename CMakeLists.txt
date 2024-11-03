@@ -31,18 +31,18 @@ find_library(LIBMPFR NAMES mpfr PATHS external/lib NO_DEFAULT_PATH)
 find_library(LIBGMP NAMES gmp PATHS external/lib NO_DEFAULT_PATH)
 
 # add executables
-add_executable(mandelbrot src/cpp/mandelbrot.cpp)
-add_executable(mersenne   src/cpp/mersenne.cpp  )
+add_executable(fractal    src/cpp/fractal.cpp )
+add_executable(mersenne   src/cpp/mersenne.cpp)
 
 # link the libraries
-target_link_libraries(mandelbrot ${LIBGMP} ${LIBGMPXX} ${LIBMPFR})
-target_link_libraries(mersenne   ${LIBGMP} ${LIBGMPXX})
+target_link_libraries(fractal  ${LIBGMP} ${LIBGMPXX} ${LIBMPFR})
+target_link_libraries(mersenne ${LIBGMP} ${LIBGMPXX}           )
 
 # find system packages
 find_package(OpenMP REQUIRED)
 
 # link OpenMP
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(mandelbrot OpenMP::OpenMP_CXX)
+    target_link_libraries(fractal    OpenMP::OpenMP_CXX)
     target_link_libraries(mersenne   OpenMP::OpenMP_CXX)
 endif()
