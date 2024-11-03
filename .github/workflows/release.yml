@@ -65,21 +65,21 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Create x86-64 Linux Shared Packages
-        run: cp -r linux-shared/bin . && tar -czf breadcrumb_linux-shared_x86-64.tar.gz bin LICENSE.md
+        run: cp LICENSE.md linux-shared/ && cd linux-shared && tar -czf breadcrumb_linux-shared_x86-64.tar.gz *
 
       - name: Create x86-64 Linux Static Packages
-        run: cp -r linux-static/bin . && tar -czf breadcrumb_linux-static_x86-64.tar.gz bin LICENSE.md
+        run: cp LICENSE.md linux-static/ && cd linux-static && tar -czf breadcrumb_linux-static_x86-64.tar.gz *
 
       - name: Release linux-shared_x86-64 Version of Breadcrumb
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          file: breadcrumb_linux-shared_x86-64.tar.gz
+          file: linux-shared/breadcrumb_linux-shared_x86-64.tar.gz
           tag: ${{github.ref}}
 
       - name: Release linux-static_x86-64 Version of Breadcrumb
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          file: breadcrumb_linux-static_x86-64.tar.gz
+          file: linux-static/breadcrumb_linux-static_x86-64.tar.gz
           tag: ${{github.ref}}
