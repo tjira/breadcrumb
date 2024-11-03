@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # check the number of arguments
-[ $# -ne 2 ] && echo "USAGE: $0 MODE CORES" && exit 1
+[ $# -ne 3 ] && echo "USAGE: $0 BUILD_TYPE COMPILE_MODE CORES" && exit 1
 
 # assign the arguments
-CORES=$2; MODE=$1; [ $MODE == "STATIC" ] && STATIC="yes" || STATIC="no"; [ $MODE == "SHARED" ] && SHARED="yes" || SHARED="no"; [ $SHARED == "no" ] && [ $STATIC == "no" ] && echo "INVALID MODE" && exit 1
+CORES=$3; MODE=$2; TYPE=${1,,}; [ $MODE == "STATIC" ] && STATIC=1 || STATIC=0; [ $MODE == "SHARED" ] && SHARED=1 || SHARED=0; [ $SHARED -eq 0 ] && [ $STATIC -eq 0 ] && echo "INVALID MODE" && exit 1
 
 # make the folders
 mkdir -p external && mkdir -p external/include && mkdir -p external/lib
@@ -31,15 +31,15 @@ cd external && for ARCHIVE in *.tar.xz; do tar -xf $ARCHIVE; done; cd ..
 cd external/gmp-6.3.0 && ./configure \
     --enable-cxx \
     --prefix="$PWD/install" \
-    --enable-shared=$SHARED \
-    --enable-static=$STATIC \
+    --enable-shared=$([ $SHARED == 1 ] && echo "yes" || echo "no") \
+    --enable-static=$([ $STATIC == 1 ] && echo "yes" || echo "no") \
 && make -j$CORES && make install && cp -r install/* .. && cd ../..
 
 # compile mpfr
 cd external/mpfr-4.2.1 && ./configure \
     --enable-cxx \
     --prefix="$PWD/install" \
-    --enable-shared=$SHARED \
-    --enable-static=$STATIC \
+    --enable-shared=$([ $SHARED == 1 ] && echo "yes" || echo "no") \
+    --enable-static=$([ $STATIC == 1 ] && echo "yes" || echo "no") \
     --enable-thread-safe \
 && make -j$CORES && make install && cp -r install/* .. && cd ../..
