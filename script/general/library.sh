@@ -43,3 +43,5 @@ cd external/mpfr-4.2.1 && ./configure \
     --enable-static=$([ $STATIC == 1 ] && echo "yes" || echo "no") \
     --enable-thread-safe \
 && make -j$CORES && make install && cp -r install/* .. && cd ../..
+
+rm -rf external/*gmp* external/*mpfr* external/lib/*la external/share external/lib/pkgconfig

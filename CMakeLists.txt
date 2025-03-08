@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # set output path
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/cpp")
 
 # set the debug and release compiler flags
 set(CMAKE_CXX_FLAGS_DEBUG "-g -pg -Og -Wall -Wextra -Wl,-rpath,'$ORIGIN' --coverage")
@@ -27,8 +27,8 @@ include_directories(include external/include)
 
 # find custom packages
 find_library(LIBGMPXX NAMES gmpxx PATHS external/lib NO_DEFAULT_PATH)
-find_library(LIBMPFR NAMES mpfr PATHS external/lib NO_DEFAULT_PATH)
-find_library(LIBGMP NAMES gmp PATHS external/lib NO_DEFAULT_PATH)
+find_library(LIBMPFR  NAMES mpfr  PATHS external/lib NO_DEFAULT_PATH)
+find_library(LIBGMP   NAMES gmp   PATHS external/lib NO_DEFAULT_PATH)
 
 # add executables
 add_executable(bcon       src/cpp/bcon.cpp    )
